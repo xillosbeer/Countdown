@@ -1,0 +1,107 @@
+﻿@page
+@model CounterModel
+@{
+    ViewData["Title"] = "Counter";
+}
+
+<style>
+    body {
+        position: relative;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #countdownContainer {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #countdownLabel {
+        font-size: 120px;
+    }
+
+    .buttonContainer {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+    }
+
+        .buttonContainer button {
+            margin-right: 10px;
+        }
+</style>
+
+<div id="countdownContainer">
+    <h2><span id="countdownLabel">:-)</span></h2>
+</div>
+
+<div class="buttonContainer">
+    <button onclick="startCountdown()">Start</button>
+    <button onclick="resetCountdown()">Reset</button>
+    <button onclick="stopCountdown()">Stop</button>
+</div>
+
+
+@section Scripts {
+    <script>
+        var countdownInterval;
+
+        function startCountdown() {
+            if (!countdownInterval) {
+                countdownInterval = setInterval(updateCountdown, 1000);
+                countdownLabel.dataset.remainingSeconds = 12;
+            }
+        }
+
+        function resetCountdown() {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            var countdownLabel = document.getElementById("countdownLabel");
+            countdownLabel.innerText = ":-)";
+            countdownLabel.style.color = "";
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+
+        function updateCountdown() {
+            var countdownLabel = document.getElementById("countdownLabel");
+            var remainingSeconds = parseInt(countdownLabel.dataset.remainingSeconds);
+            var warningThreshold = 10;
+
+            if (remainingSeconds <= warningThreshold) {
+                countdownLabel.style.color = countdownLabel.style.color === "red"
+                    ? ""
+                    : "red";
+            }
+
+            var hours = Math.floor(remainingSeconds / 3600);
+            var minutes = Math.floor((remainingSeconds % 3600) / 60);
+            var seconds = remainingSeconds % 60;
+
+            countdownLabel.innerText = formatTime(hours) + ":" + formatTime(minutes) + ":" + formatTime(seconds);
+
+            countdownLabel.dataset.remainingSeconds = remainingSeconds - 1;
+
+            if (remainingSeconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                countdownLabel.innerText = "KONIEC!";
+            }
+        }
+
+        function formatTime(value) {
+            return value.toString().padStart(2, "0");
+        }
+    </script>
+}
